@@ -47,6 +47,9 @@ let moveSongUpEnabled = true;
 let bagItems = [];
 let currentItemPage = 0;
 let currentBagItems = [];
+let longPressTimers = {};
+let currentLongPressItem = null;
+let itemStatus = {};
 
 document.addEventListener('copy', e => e.preventDefault());
 document.addEventListener('cut', e => e.preventDefault());
@@ -143,15 +146,45 @@ function openBag(title, bagIndex) {
 function renderItems() {
   const start = currentItemPage * 12;
   const end = Math.min(start + 12, currentBagItems.length);
-  let listHTML = '';
   const folder = encodeURIComponent(bagsInfo[currentBagIndex].title);
+  const list = document.getElementById('items-list');
+  list.innerHTML = '';
   for (let i = start; i < end; i++) {
     const item = currentBagItems[i];
     const checked = checkedItemsPerBag[currentBagIndex].has(i);
     const src = `Imagens/${folder}/${encodeURIComponent(item)}`;
-    listHTML += `<img id="item-${i}" class="item-img ${checked ? 'checked' : ''}" onclick="toggleItem(${i})" src="${src}" alt="item" />`;
+    const img = document.createElement('img');
+    img.id = `item-${i}`;
+    img.src = src;
+    img.alt = 'item';
+    img.className = `item-img ${checked ? 'checked' : ''}`;
+
+    let longPress = false;
+    const startPress = () => {
+      longPress = false;
+      startItemPress(i, () => {
+        longPress = true;
+      });
+    };
+    const cancelPress = () => {
+      cancelItemPress(i);
+    };
+
+    img.addEventListener('touchstart', startPress);
+    img.addEventListener('touchend', e => {
+      cancelPress();
+      if (!longPress) toggleItem(i);
+    });
+    img.addEventListener('touchmove', cancelPress);
+    img.addEventListener('mousedown', startPress);
+    img.addEventListener('mouseup', e => {
+      cancelPress();
+      if (!longPress) toggleItem(i);
+    });
+    img.addEventListener('mouseleave', cancelPress);
+
+    list.appendChild(img);
   }
-  document.getElementById('items-list').innerHTML = listHTML;
 }
 
 function nextItemPage() {
@@ -182,7 +215,7 @@ function toggleItem(index) {
   } else {
     toggleTracker[key] = { count: 1, start: now };
   }
-  if (toggleTracker[key] && toggleTracker[key].count >= 3) {
+  if (toggleTracker[key] && toggleTracker[key].count >= 6) {
     toggleTracker[key] = null;
     showMusicOverlay();
   }
@@ -198,6 +231,50 @@ function toggleItem(index) {
   }
   saveProgress();
   updateProgress();
+}
+
+function startItemPress(idx, cb) {
+  currentLongPressItem = idx;
+  longPressTimers[idx] = setTimeout(() => {
+    cb();
+    showItemActionMenu();
+  }, 3000);
+}
+
+function cancelItemPress(idx) {
+  clearTimeout(longPressTimers[idx]);
+}
+
+function showItemActionMenu() {
+  const menu = document.getElementById('item-action-menu');
+  menu.style.display = 'flex';
+  requestAnimationFrame(() => (menu.style.opacity = 1));
+}
+
+function hideItemActionMenu() {
+  const menu = document.getElementById('item-action-menu');
+  menu.style.opacity = 0;
+  setTimeout(() => {
+    menu.style.display = 'none';
+    currentLongPressItem = null;
+  }, 300);
+}
+
+function selectItemAction(action) {
+  if (currentLongPressItem !== null) {
+    const key = currentBagIndex + '-' + currentLongPressItem;
+    itemStatus[key] = action;
+    saveItemStatus();
+  }
+  hideItemActionMenu();
+}
+
+function loadItemStatus() {
+  itemStatus = JSON.parse(localStorage.getItem('itemStatus') || '{}');
+}
+
+function saveItemStatus() {
+  localStorage.setItem('itemStatus', JSON.stringify(itemStatus));
 }
 
 function updateProgress() {
@@ -274,12 +351,82 @@ async function preloadContent() {
   await Promise.all(promises);
 }
 
+async function cacheAssets() {
+  const assets = [];
+  bagsInfo.forEach((bag) => {
+    const folder = encodeURIComponent(bag.title);
+    bag.items.forEach(item => {
+      assets.push(`Imagens/${folder}/${encodeURIComponent(item)}`);
+    });
+  });
+  musicList.forEach(m => assets.push('Songs/' + encodeURIComponent(m.file)));
+
+  let total = 0;
+  for (const url of assets) {
+    try {
+      const head = await fetch(url, { method: 'HEAD' });
+      const len = head.headers.get('content-length');
+      total += len ? parseInt(len) : 0;
+    } catch (e) {}
+  }
+
+  let loaded = 0;
+  for (const url of assets) {
+    try {
+      const res = await fetch(url);
+      const blob = await res.blob();
+      loaded += blob.size;
+      const reader = new FileReader();
+      const dataUrl = await new Promise(resolve => {
+        reader.onload = () => resolve(reader.result);
+        reader.readAsDataURL(blob);
+      });
+      localStorage.setItem('asset:' + url, dataUrl);
+    } catch (e) {}
+    updateLoader(loaded, total);
+  }
+  document.getElementById('loader-overlay').style.display = 'none';
+}
+
+function updateLoader(loaded, total) {
+  const pct = total ? Math.round((loaded / total) * 100) : 0;
+  const circle = document.querySelector('.loader-circle circle');
+  const dash = 345 - (345 * pct) / 100;
+  circle.style.strokeDashoffset = dash;
+  document.getElementById('loader-text').innerText = pct + '%';
+  document.getElementById('loader-mb').innerText = `${(loaded / 1048576).toFixed(2)} MB / ${(total / 1048576).toFixed(2)} MB`;
+}
+
+function setupMenu() {
+  document.getElementById('menu-bags').addEventListener('click', () => {
+    document.getElementById('bags-page').style.display = 'flex';
+    hideMusicOverlay();
+    hideItemsOverlay();
+  });
+  document.getElementById('menu-music').addEventListener('click', showMusicOverlay);
+  document.getElementById('menu-items').addEventListener('click', showItemsOverlay);
+  document.getElementById('menu-more').addEventListener('click', () => {});
+  document.getElementById('items-overlay').addEventListener('click', e => {
+    if (e.target.id === 'items-overlay') hideItemsOverlay();
+  });
+  document.getElementById('item-action-menu').addEventListener('click', e => {
+    if (e.target.id === 'item-action-menu') hideItemActionMenu();
+  });
+}
+
 async function init() {
+  loadItemStatus();
   await loadBagItems();
+  if (!localStorage.getItem('assetsCached')) {
+    await cacheAssets();
+    localStorage.setItem('assetsCached', 'true');
+  } else {
+    document.getElementById('loader-overlay').style.display = 'none';
+  }
   await preloadContent();
   loadProgress();
   renderPage();
-  document.body.style.display = 'flex';
+  setupMenu();
 }
 
 function disableAllButtons(disable) {
@@ -356,11 +503,33 @@ function showMusicOverlay() {
   currentMusicPage = 0;
   renderMusicOverlay();
   overlay.style.display = 'flex';
+  requestAnimationFrame(() => (overlay.style.opacity = 1));
 }
 
 function hideMusicOverlay() {
   const overlay = document.getElementById('music-overlay');
-  overlay.style.display = 'none';
+  overlay.style.opacity = 0;
+  setTimeout(() => (overlay.style.display = 'none'), 300);
+}
+
+function showItemsOverlay() {
+  const overlay = document.getElementById('items-overlay');
+  overlay.innerHTML = '';
+  Object.keys(itemStatus).forEach(key => {
+    const [bagIdx, itemIdx] = key.split('-').map(Number);
+    const div = document.createElement('div');
+    div.className = 'flagged-item';
+    div.textContent = `${bagsInfo[bagIdx].title}: ${bagItems[bagIdx][itemIdx]} - ${itemStatus[key]}`;
+    overlay.appendChild(div);
+  });
+  overlay.style.display = 'flex';
+  requestAnimationFrame(() => (overlay.style.opacity = 1));
+}
+
+function hideItemsOverlay() {
+  const overlay = document.getElementById('items-overlay');
+  overlay.style.opacity = 0;
+  setTimeout(() => (overlay.style.display = 'none'), 300);
 }
 
 function nextMusicPage() {
