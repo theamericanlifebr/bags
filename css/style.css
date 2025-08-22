@@ -225,4 +225,14 @@ h1 {
   width: 0%;
 }
 
+@keyframes flash-green {
+  0% { background: #155fe8; }
+  50% { background: #00ff00; }
+  100% { background: #155fe8; }
+}
+
+.boxmusic.flash {
+  animation: flash-green 0.3s;
+}
+
 
