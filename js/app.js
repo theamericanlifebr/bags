@@ -1,12 +1,12 @@
 const bagsInfo = [
-  {title: 'Bag Cenario 1', color: 'linear-gradient(135deg, #444, #777)', items: ['Barra de ferro simples 01','Barra de ferro simples 02','Barra de ferro simples 03','Barra de ferro simples 04']},
-  {title: 'Bag Cenario 2', color: 'linear-gradient(135deg, #444, #777)', items: ['Barra de ferro simples 05','Barra de ferro simples 06','Barra de ferro simples 07','Barra de ferro simples 08']},
-  {title: 'Bag Cenario 3', color: 'linear-gradient(135deg, #444, #777)', items: ['Barra de ferro com conector 01','Barra de ferro com conector 02','Barra de ferro com conector 03','Barra de ferro com conector 04']},
-  {title: 'Bag Cenario 4', color: 'linear-gradient(135deg, #444, #777)', items: ['Barra de ferro com conector 05','Barra de ferro com conector 06','Barra de ferro com conector 07','Barra de ferro com conector 08']},
-  {title: 'Bag Stella', color: 'linear-gradient(135deg, #e91e63, #ff80ab)', items: ['Peruca Stella','Vestido Stella','Maquiagem Stella','Sapatilha Stella','Meia Stella']},
-  {title: 'Bag WJ', color: 'linear-gradient(135deg, #f00, #ffeb3b)', items: ['Cabeça WJ','Camisa WJ','Jaleco WJ','Calça WJ']},
-  {title: 'Bag Professor Xuxu', color: 'linear-gradient(135deg, #ff9800, #2196f3)', items: ['Boina Professor Xuxu','Óculos Professor Xuxu','Calça Professor Xuxu','Camisa Professor Xuxu','Jaleco Professor Xuxu','Luvas Professor Xuxu','Óculos Professor Xuxu']},
-  {title: 'Bag 08', color: 'linear-gradient(135deg, #673ab7, #ffd700)', items: ['Lápis cenográfico','Tesoura cenográfica','Boneco pequeno (brinde)','Fantoche 01','Fantoche 02','Fantoche 03','Fantoche 04']}
+  {title: 'Bag Cenario 1', color: 'linear-gradient(135deg, #444, #777)', items: ['barra1_palco.png','barra2_palco.png','barra3_palco.png','barra4_palco.png']},
+  {title: 'Bag Cenario 2', color: 'linear-gradient(135deg, #444, #777)', items: ['barra5_palco.png','barra6_palco.png','barra7_palco.png','barra8_palco.png']},
+  {title: 'Bag Cenario 3', color: 'linear-gradient(135deg, #444, #777)', items: ['barra9_palco.png','barra10_palco.png','barra11_palco.png','barra12_palco.png']},
+  {title: 'Bag Cenario 4', color: 'linear-gradient(135deg, #444, #777)', items: ['barra13_palco.png','barra14_palco.png','barra15_palco.png','barra16_palco.png']},
+  {title: 'Bag Stella', color: 'linear-gradient(135deg, #e91e63, #ff80ab)', items: ['blusa_stella.png','jaleco_stella.png','maquiagem_stella.png','meia1_stella.png','meia2_stella.png','peruca_stella.png','saia_stella.png','sapato1_stella.png','sapato2_stella.png']},
+  {title: 'Bag WJ', color: 'linear-gradient(135deg, #f00, #ffeb3b)', items: ['calça wj.png','colete_wj.png','luva_wj.png','mascara wj.png','sapatos_wj.png']},
+  {title: 'Bag Professor Xuxu', color: 'linear-gradient(135deg, #ff9800, #2196f3)', items: ['boina_professor.png','oculos_professor.png','calça_professor.png','camisa_professor.png','jaleco_professor.png','luva1_professor.png','luva2_professor.png','sapato1_professor.png','sapato2_professor.png']},
+  {title: 'Bag 08', color: 'linear-gradient(135deg, #673ab7, #ffd700)', items: ['extensao_palco.png','laser1_palco.png','laser2_palco.png','laser3_palco.png','laser4_palco.png','laser_palco.png','setlight1_palco.png','setlight2_palco.png','setlight3_palco.png']}
 ];
 
 let checkedItemsPerBag = bagsInfo.map(() => new Set());
@@ -72,9 +72,11 @@ function openBag(title, bagIndex, items, bgColor) {
   let listHTML = '';
   currentBagIndex = bagIndex;
 
+  const folder = encodeURIComponent(title);
   items.forEach((item, i) => {
     const checked = checkedItemsPerBag[bagIndex].has(i);
-    listHTML += `<h2 id="item-${i}" class="${checked ? 'checked' : ''}" onclick="toggleItem(${i})">${item}</h2>`;
+    const src = `Imagens/${folder}/${encodeURIComponent(item)}`;
+    listHTML += `<img id="item-${i}" class="${checked ? 'checked' : ''}" onclick="toggleItem(${i})" src="${src}" alt="item" />`;
   });
 
   document.getElementById('items-list').innerHTML = listHTML;
