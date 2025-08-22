@@ -1,14 +1,14 @@
-const defaultColor = 'linear-gradient(135deg, #000000, #4F4F4F)';
+const defaultColor = 'linear-gradient(135deg, #ffffff, #e5e5e5)';
 
 const bagsInfo = [
-  {title: 'Barras de Ferro 1', boxColor: 'linear-gradient(135deg,#000000,#4F4F4F)', items: ['barra1_palco.png','barra2_palco.png','barra3_palco.png','barra4_palco.png']},
-  {title: 'Barras de Ferro 2', boxColor: 'linear-gradient(135deg,#000000,#00008B)', items: ['barra5_palco.png','barra6_palco.png','barra7_palco.png','barra8_palco.png']},
-  {title: 'Barras de Ferro 3', boxColor: 'linear-gradient(135deg,#000000,#4B0082)', items: ['barra9_palco.png','barra10_palco.png','barra11_palco.png','barra12_palco.png']},
-  {title: 'Barras de Ferro 4', boxColor: 'linear-gradient(135deg,#000000,#FF8C00)', items: ['barra13_palco.png','barra14_palco.png','barra15_palco.png','barra16_palco.png']},
-  {title: 'Stella', boxColor: 'linear-gradient(135deg,#000000,#4F4F4F)', modalColor: 'linear-gradient(135deg,#ff1493,#ff69b4)', items: ['blusa_stella.png','jaleco_stella.png','maquiagem_stella.png','meia1_stella.png','meia2_stella.png','peruca_stella.png','saia_stella.png','sapato1_stella.png','sapato2_stella.png']},
-  {title: 'WJ Barras de Ferro 2', boxColor: 'linear-gradient(135deg,#000000,#00008B)', modalColor: 'linear-gradient(135deg,#ff0000,#ffd700)', items: ['calça wj.png','colete_wj.png','luva_wj.png','mascara wj.png','sapatos_wj.png']},
-  {title: 'Professor Xuxu', boxColor: 'linear-gradient(135deg,#000000,#4B0082)', modalColor: 'linear-gradient(135deg,#ffd700,#add8e6)', items: ['boina_professor.png','oculos_professor.png','calça_professor.png','camisa_professor.png','jaleco_professor.png','luva1_professor.png','luva2_professor.png','sapato1_professor.png','sapato2_professor.png']},
-  {title: 'Iluminação', boxColor: 'linear-gradient(135deg,#000000,#FF8C00)', modalColor: 'linear-gradient(135deg,#000000,#32CD32,#800080)', items: ['extensao_palco.png','laser1_palco.png','laser2_palco.png','laser3_palco.png','laser4_palco.png','laser_palco.png','setlight1_palco.png','setlight2_palco.png','setlight3_palco.png']},
+  {title: 'Barras de Ferro 1', boxColor: defaultColor, items: ['barra1_palco.png','barra2_palco.png','barra3_palco.png','barra4_palco.png']},
+  {title: 'Barras de Ferro 2', boxColor: defaultColor, items: ['barra5_palco.png','barra6_palco.png','barra7_palco.png','barra8_palco.png']},
+  {title: 'Barras de Ferro 3', boxColor: defaultColor, items: ['barra9_palco.png','barra10_palco.png','barra11_palco.png','barra12_palco.png']},
+  {title: 'Barras de Ferro 4', boxColor: defaultColor, items: ['barra13_palco.png','barra14_palco.png','barra15_palco.png','barra16_palco.png']},
+  {title: 'Stella', boxColor: defaultColor, modalColor: defaultColor, items: ['blusa_stella.png','jaleco_stella.png','maquiagem_stella.png','meia1_stella.png','meia2_stella.png','peruca_stella.png','saia_stella.png','sapato1_stella.png','sapato2_stella.png']},
+  {title: 'WJ Barras de Ferro 2', boxColor: defaultColor, modalColor: defaultColor, items: ['calça wj.png','colete_wj.png','luva_wj.png','mascara wj.png','sapatos_wj.png']},
+  {title: 'Professor Xuxu', boxColor: defaultColor, modalColor: defaultColor, items: ['boina_professor.png','oculos_professor.png','calça_professor.png','camisa_professor.png','jaleco_professor.png','luva1_professor.png','luva2_professor.png','sapato1_professor.png','sapato2_professor.png']},
+  {title: 'Iluminação', boxColor: defaultColor, modalColor: defaultColor, items: ['extensao_palco.png','laser1_palco.png','laser2_palco.png','laser3_palco.png','laser4_palco.png','laser_palco.png','setlight1_palco.png','setlight2_palco.png','setlight3_palco.png']},
   {title: 'Box Bit', boxColor: defaultColor, items: ['luva1_bit.png','luva2_bit.png','mascara bit.png','roupa_bit.png','sapato1_bit.png','sapato2_bit.png']},
   {title: 'Bag Byte', boxColor: defaultColor, items: ['luva1_byte.png','luva2_byte.png','mascara_byte.png','roupa_byte.png','sapato1_byte.png','sapato2_byte.png']},
   {title: 'Bag Gerente', boxColor: defaultColor, items: ['boina_gerente.png','luva1_gerente.png','luva2_gerente.png','oculos_gerente.png','terno_gerente.png']},
@@ -78,7 +78,7 @@ function renderPage() {
     const bagDiv = document.createElement('div');
     bagDiv.className = 'bag';
     bagDiv.style.background = bag.boxColor || defaultColor;
-    bagDiv.style.color = '#fff';
+    bagDiv.style.color = '#000';
     bagDiv.innerText = bag.title;
     bagDiv.onclick = () => openBag(bag.title, globalIndex);
     wrapper.appendChild(bagDiv);

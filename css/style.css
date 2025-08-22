@@ -49,9 +49,9 @@ h1 {
   padding: 15px;
   cursor: pointer;
   font-weight: bold;
-  color: #fff;
+  color: #333;
   width: 100%;
-  background: linear-gradient(135deg, #000000, #4F4F4F);
+  background: linear-gradient(135deg, #ffffff, #e5e5e5);
   transition: transform 0.3s, opacity 0.3s;
 }
 
@@ -95,7 +95,7 @@ h1 {
   height: 100%;
   max-width: none;
   text-align: center;
-  color: #fff;
+  color: #000;
   background: linear-gradient(135deg, #eeeeee, #ffffff);
   display: flex;
   flex-direction: column;
@@ -213,7 +213,7 @@ h1 {
 }
 
 .music-overlay.locked {
-  background: linear-gradient(#ffffff, #cce5ff);
+  background: linear-gradient(#ffffff, #99c2ff);
 }
 
 .boxmusic {
