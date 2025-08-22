@@ -290,8 +290,10 @@ function updateProgress() {
   const items = currentBagItems;
   const checkedCount = checkedItemsPerBag[currentBagIndex].size;
   const percent = (checkedCount / items.length) * 100;
-  document.getElementById('progress-bar').style.width = percent + '%';
-  document.getElementById(`bag-progress-${currentBagIndex}`).style.width = percent + '%';
+  const bar = document.getElementById('progress-bar');
+  if (bar) bar.style.width = percent + '%';
+  const bagBar = document.getElementById(`bag-progress-${currentBagIndex}`);
+  if (bagBar) bagBar.style.width = percent + '%';
   updateGlobalProgress();
 }
 
