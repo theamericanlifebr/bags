@@ -40,6 +40,9 @@ let currentMusicPage = 0;
 const songTapCounts = {};
 const songTapTimers = {};
 let musicTouchStartX = 0;
+const secretSequence = [0, 1, 2, 3, 5];
+let secretIndex = 0;
+let moveSongUpEnabled = true;
 
 let bagItems = [];
 let currentItemPage = 0;
@@ -292,7 +295,37 @@ function renderMusicOverlay() {
     box.className = 'boxmusic';
     box.id = `music-box-${idx}`;
     box.innerText = m.title;
-    box.addEventListener('click', () => handleMusicTap(idx));
+
+    let pressTimer;
+    let longPress = false;
+    const startPress = () => {
+      longPress = false;
+      pressTimer = setTimeout(() => {
+        longPress = true;
+        box.classList.add('flash');
+        setTimeout(() => box.classList.remove('flash'), 300);
+        playMusic(idx);
+      }, 1000);
+    };
+    const cancelPress = () => {
+      clearTimeout(pressTimer);
+    };
+
+    box.addEventListener('touchstart', startPress);
+    box.addEventListener('touchend', cancelPress);
+    box.addEventListener('touchmove', cancelPress);
+    box.addEventListener('mousedown', startPress);
+    box.addEventListener('mouseup', cancelPress);
+    box.addEventListener('mouseleave', cancelPress);
+
+    box.addEventListener('click', () => {
+      if (longPress) {
+        longPress = false;
+        return;
+      }
+      handleMusicTap(idx);
+    });
+
     const progress = document.createElement('div');
     progress.className = 'music-progress';
     progress.innerHTML = `<div class="music-progress-bar" id="music-progress-${idx}"></div>`;
@@ -312,6 +345,7 @@ function showMusicOverlay() {
     });
     overlay.addEventListener('touchend', e => {
       const endX = e.changedTouches[0].screenX;
+      // deslize para a direita para acessar a próxima página de músicas
       if (endX > musicTouchStartX + 50) nextMusicPage();
       if (endX < musicTouchStartX - 50) prevMusicPage();
     });
@@ -365,14 +399,26 @@ function playMusic(idx) {
   currentAudio.play();
 }
 
+function updateSecretSequence(idx) {
+  if (idx === secretSequence[secretIndex]) {
+    secretIndex++;
+    if (secretIndex === secretSequence.length) {
+      moveSongUpEnabled = !moveSongUpEnabled;
+      secretIndex = 0;
+    }
+  } else {
+    secretIndex = idx === secretSequence[0] ? 1 : 0;
+  }
+}
+
 function handleMusicTap(idx) {
+  updateSecretSequence(idx);
+  if (!moveSongUpEnabled) return;
   songTapCounts[idx] = (songTapCounts[idx] || 0) + 1;
   clearTimeout(songTapTimers[idx]);
   songTapTimers[idx] = setTimeout(() => {
     if (songTapCounts[idx] >= 3) {
       moveSongUp(idx);
-    } else {
-      playMusic(idx);
     }
     songTapCounts[idx] = 0;
   }, 300);
