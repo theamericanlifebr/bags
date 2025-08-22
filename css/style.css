@@ -1,5 +1,9 @@
 *, *::before, *::after {
   box-sizing: border-box;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
 }
 
 body {
@@ -191,11 +195,11 @@ h1 {
   align-items: center;
   justify-content: center;
   gap: 20px;
-  background: rgba(255, 255, 255, 0.95);
+  background: linear-gradient(#ffffff, #cccccc);
 }
 
 .boxmusic {
-  background: #155fe8;
+  background: linear-gradient(#155fe8, #4a90ff);
   opacity: 1;
   padding: 20px;
   border-radius: 12px;
@@ -207,7 +211,7 @@ h1 {
 }
 
 .boxmusic.playing {
-  background: #0e4cb8;
+  background: linear-gradient(#0e4cb8, #3470d4);
 }
 
 .music-progress {
@@ -226,9 +230,9 @@ h1 {
 }
 
 @keyframes flash-green {
-  0% { background: #155fe8; }
+  0% { background: linear-gradient(#155fe8, #4a90ff); }
   50% { background: #00ff00; }
-  100% { background: #155fe8; }
+  100% { background: linear-gradient(#155fe8, #4a90ff); }
 }
 
 .boxmusic.flash {
