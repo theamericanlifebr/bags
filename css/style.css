@@ -126,8 +126,8 @@ h1 {
   cursor: pointer;
 }
 
-.checked {
-  opacity: 1 !important;
+.item-img.checked {
+  opacity: 1;
 }
 
 .progress-footer {
