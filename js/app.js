@@ -8,7 +8,11 @@ const bagsInfo = [
   {title: 'Bag Stella', items: ['blusa_stella.png','jaleco_stella.png','maquiagem_stella.png','meia1_stella.png','meia2_stella.png','peruca_stella.png','saia_stella.png','sapato1_stella.png','sapato2_stella.png']},
   {title: 'Bag WJ', items: ['calça wj.png','colete_wj.png','luva_wj.png','mascara wj.png','sapatos_wj.png']},
   {title: 'Bag Professor Xuxu', items: ['boina_professor.png','oculos_professor.png','calça_professor.png','camisa_professor.png','jaleco_professor.png','luva1_professor.png','luva2_professor.png','sapato1_professor.png','sapato2_professor.png']},
-  {title: 'Bag 08', items: ['extensao_palco.png','laser1_palco.png','laser2_palco.png','laser3_palco.png','laser4_palco.png','laser_palco.png','setlight1_palco.png','setlight2_palco.png','setlight3_palco.png']}
+  {title: 'Bag 08', items: ['extensao_palco.png','laser1_palco.png','laser2_palco.png','laser3_palco.png','laser4_palco.png','laser_palco.png','setlight1_palco.png','setlight2_palco.png','setlight3_palco.png']},
+  {title: 'bag bit', items: ['luva1_bit.png','luva2_bit.png','mascara bit.png','roupa_bit.png','sapato1_bit.png','sapato2_bit.png']},
+  {title: 'bag byte', items: ['luva1_byte.png','luva2_byte.png','mascara_byte.png','roupa_byte.png','sapato1_byte.png','sapato2_byte.png']},
+  {title: 'bag gerente', items: ['boina_gerente.png','luva1_gerente.png','luva2_gerente.png','oculos_gerente.png','terno_gerente.png']},
+  {title: 'bag duque maldoso', items: ['avental_duque.png','calca_duque.png','cartola_duque.png','oculos_duque.png']}
 ];
 
 const musicList = [
@@ -20,7 +24,7 @@ const musicList = [
   {title: 'Eu vim aqui para adorar', file: 'Eu vim aqui para adorar.mp3'}
 ];
 
-let checkedItemsPerBag = bagsInfo.map(() => new Set());
+let checkedItemsPerBag = [];
 let currentBagIndex = null;
 let currentPage = 0;
 let toggleTracker = {};
@@ -45,11 +49,13 @@ function renderPage() {
 
     const progress = document.createElement('div');
     progress.className = 'bag-progress';
-    progress.innerHTML = `<div class="bag-progress-bar" id="bag-progress-${globalIndex}"></div>`;
+    const percent = (checkedItemsPerBag[globalIndex].size / bag.items.length) * 100;
+    progress.innerHTML = `<div class="bag-progress-bar" id="bag-progress-${globalIndex}" style="width:${percent}%"></div>`;
     wrapper.appendChild(progress);
 
     container.appendChild(wrapper);
   });
+  updateGlobalProgress();
 }
 
 function prevPage() {
@@ -124,6 +130,7 @@ function toggleItem(index) {
     itemElement.classList.add('checked');
     new Audio('Songs/Sucesso.mp3').play();
   }
+  saveProgress();
   updateProgress();
 }
 
@@ -133,8 +140,10 @@ function updateProgress() {
   const percent = (checkedCount / items.length) * 100;
   document.getElementById('progress-bar').style.width = percent + '%';
   document.getElementById(`bag-progress-${currentBagIndex}`).style.width = percent + '%';
+  updateGlobalProgress();
+}
 
-  // update global progress
+function updateGlobalProgress() {
   let totalItems = 0;
   let totalChecked = 0;
   bagsInfo.forEach((bag, idx) => {
@@ -143,6 +152,48 @@ function updateProgress() {
   });
   const globalPercent = (totalChecked / totalItems) * 100;
   document.getElementById('global-progress-bar').style.width = globalPercent + '%';
+}
+
+function loadProgress() {
+  const saved = localStorage.getItem('checkedItemsPerBag');
+  if (saved) {
+    const parsed = JSON.parse(saved);
+    checkedItemsPerBag = bagsInfo.map((_, idx) => new Set(parsed[idx] || []));
+  } else {
+    checkedItemsPerBag = bagsInfo.map(() => new Set());
+  }
+}
+
+function saveProgress() {
+  const data = checkedItemsPerBag.map(set => Array.from(set));
+  localStorage.setItem('checkedItemsPerBag', JSON.stringify(data));
+}
+
+async function preloadContent() {
+  const promises = [];
+  bagsInfo.forEach(bag => {
+    const folder = encodeURIComponent(bag.title);
+    bag.items.forEach(item => {
+      const img = new Image();
+      img.src = `Imagens/${folder}/${encodeURIComponent(item)}`;
+      promises.push(new Promise(res => { img.onload = img.onerror = res; }));
+    });
+  });
+  musicList.forEach(m => {
+    const audio = new Audio('Songs/' + encodeURIComponent(m.file));
+    promises.push(new Promise(res => {
+      audio.addEventListener('canplaythrough', res, { once: true });
+      audio.addEventListener('error', res, { once: true });
+    }));
+  });
+  await Promise.all(promises);
+}
+
+async function init() {
+  await preloadContent();
+  loadProgress();
+  renderPage();
+  document.body.style.display = 'flex';
 }
 
 function disableAllButtons(disable) {
@@ -247,4 +298,4 @@ function fadeOutCurrentAudio() {
 }
 
 // Initial render
-renderPage();
+init();
