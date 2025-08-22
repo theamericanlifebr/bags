@@ -82,12 +82,19 @@ h1 {
   color: white;
 }
 
-h2 {
-  cursor: pointer;
-  margin: 10px 0;
-  font-size: 1.2em;
+#items-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  justify-items: center;
+}
+
+#items-list img {
+  width: 100%;
+  max-width: 100px;
   opacity: 0.5;
   transition: opacity 0.3s;
+  cursor: pointer;
 }
 
 .checked {
