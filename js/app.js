@@ -89,7 +89,7 @@ function openBag(title, bagIndex, items) {
   items.forEach((item, i) => {
     const checked = checkedItemsPerBag[bagIndex].has(i);
     const src = `Imagens/${folder}/${encodeURIComponent(item)}`;
-    listHTML += `<img id="item-${i}" class="${checked ? 'checked' : ''}" onclick="toggleItem(${i})" src="${src}" alt="item" />`;
+    listHTML += `<img id="item-${i}" class="item-img ${checked ? 'checked' : ''}" onclick="toggleItem(${i})" src="${src}" alt="item" />`;
   });
 
   document.getElementById('items-list').innerHTML = listHTML;
