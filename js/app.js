@@ -48,6 +48,11 @@ let bagItems = [];
 let currentItemPage = 0;
 let currentBagItems = [];
 
+document.addEventListener('copy', e => e.preventDefault());
+document.addEventListener('cut', e => e.preventDefault());
+document.addEventListener('paste', e => e.preventDefault());
+document.addEventListener('contextmenu', e => e.preventDefault());
+
 function renderPage() {
   const container = document.getElementById('bags-page');
   container.innerHTML = '';
@@ -337,17 +342,14 @@ function renderMusicOverlay() {
 function showMusicOverlay() {
   const overlay = document.getElementById('music-overlay');
   if (!overlay.dataset.init) {
-    overlay.addEventListener('click', e => {
-      if (!currentAudio && e.target.id === 'music-overlay') hideMusicOverlay();
-    });
     overlay.addEventListener('touchstart', e => {
       musicTouchStartX = e.changedTouches[0].screenX;
     });
     overlay.addEventListener('touchend', e => {
       const endX = e.changedTouches[0].screenX;
-      // deslize para a direita para acessar a próxima página de músicas
-      if (endX > musicTouchStartX + 50) nextMusicPage();
-      if (endX < musicTouchStartX - 50) prevMusicPage();
+      // deslize para a esquerda para acessar a próxima página de músicas
+      if (endX < musicTouchStartX - 50) nextMusicPage();
+      if (endX > musicTouchStartX + 50) prevMusicPage();
     });
     overlay.dataset.init = 'true';
   }
