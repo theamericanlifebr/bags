@@ -1,3 +1,7 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 body {
   background: linear-gradient(135deg, #155fe8, #5588ff);
   color: #333;
