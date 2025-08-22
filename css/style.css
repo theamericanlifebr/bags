@@ -212,6 +212,10 @@ h1 {
   transition: opacity 0.3s;
 }
 
+.music-overlay.locked {
+  background: linear-gradient(#ffffff, #cce5ff);
+}
+
 .boxmusic {
   background: linear-gradient(#155fe8, #4a90ff);
   opacity: 1;

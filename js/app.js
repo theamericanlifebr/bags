@@ -30,6 +30,15 @@ const musicList = [
   'Louvarei'
 ];
 
+// Map explicit file names for songs whose title differs from the mp3 name
+const songFiles = {
+  'Eu vim aqui para adorar': 'Eu vim aqui para adorar.mp3',
+  'Você não é todo mundo': 'Você não é todo mundo.mp3',
+  'Fábrica de Heróis': 'A Fabrica de Heróis.mp3',
+  'Você é especial': 'Você é especial.mp3',
+  'Casinha do coração': 'Casinha do coração.mp3'
+};
+
 let checkedItemsPerBag = [];
 let currentBagIndex = null;
 let currentPage = 0;
@@ -450,10 +459,22 @@ function renderMusicOverlay() {
 
     let pressTimer;
     let longPress = false;
+    const progress = document.createElement('div');
+    progress.className = 'music-progress';
+    const progressBar = document.createElement('div');
+    progressBar.className = 'music-progress-bar';
+    progressBar.id = `music-progress-${idx}`;
+    progress.appendChild(progressBar);
+    box.appendChild(progress);
+
     const startPress = () => {
       longPress = false;
+      progressBar.style.transition = 'width 1s linear';
+      progressBar.style.width = '100%';
       pressTimer = setTimeout(() => {
         longPress = true;
+        progressBar.style.transition = '';
+        progressBar.style.width = '0%';
         box.classList.add('flash');
         setTimeout(() => box.classList.remove('flash'), 300);
         playMusic(idx);
@@ -461,6 +482,8 @@ function renderMusicOverlay() {
     };
     const cancelPress = () => {
       clearTimeout(pressTimer);
+      progressBar.style.transition = '';
+      progressBar.style.width = '0%';
     };
 
     box.addEventListener('touchstart', startPress);
@@ -478,10 +501,6 @@ function renderMusicOverlay() {
       handleMusicTap(idx);
     });
 
-    const progress = document.createElement('div');
-    progress.className = 'music-progress';
-    progress.innerHTML = `<div class="music-progress-bar" id="music-progress-${idx}"></div>`;
-    box.appendChild(progress);
     overlay.appendChild(box);
   });
 }
@@ -560,9 +579,13 @@ function playMusic(idx) {
     currentAudio.pause();
   }
   const title = musicList[idx];
-  currentAudio = new Audio('Songs/' + encodeURIComponent(title + '.mp3'));
+  const file = songFiles[title] || (title + '.mp3');
+  currentAudio = new Audio('Songs/' + encodeURIComponent(file));
   const progressBar = document.getElementById(`music-progress-${idx}`);
-  document.querySelectorAll('.music-progress-bar').forEach(bar => bar.style.width = '0%');
+  document.querySelectorAll('.music-progress-bar').forEach(bar => {
+    bar.style.transition = '';
+    bar.style.width = '0%';
+  });
   document.querySelectorAll('.boxmusic').forEach(box => box.classList.remove('playing'));
   const selectedBox = document.getElementById(`music-box-${idx}`);
   if (selectedBox) selectedBox.classList.add('playing');
@@ -584,6 +607,13 @@ function updateSecretSequence(idx) {
     secretIndex++;
     if (secretIndex === secretSequence.length) {
       moveSongUpEnabled = !moveSongUpEnabled;
+      const overlay = document.getElementById('music-overlay');
+      if (moveSongUpEnabled) {
+        overlay.classList.remove('locked');
+      } else {
+        overlay.classList.add('locked');
+        new Audio('Songs/Sucesso.mp3').play();
+      }
       secretIndex = 0;
     }
   } else {
@@ -597,7 +627,7 @@ function handleMusicTap(idx) {
   songTapCounts[idx] = (songTapCounts[idx] || 0) + 1;
   clearTimeout(songTapTimers[idx]);
   songTapTimers[idx] = setTimeout(() => {
-    if (songTapCounts[idx] >= 3) {
+    if (songTapCounts[idx] >= 2) {
       moveSongUp(idx);
     }
     songTapCounts[idx] = 0;
@@ -609,6 +639,12 @@ function moveSongUp(idx) {
   [musicList[idx - 1], musicList[idx]] = [musicList[idx], musicList[idx - 1]];
   if (idx - 1 < currentMusicPage * songsPerPage) currentMusicPage--;
   renderMusicOverlay();
+  const box = document.getElementById(`music-box-${idx - 1}`);
+  if (box) {
+    box.classList.add('flash');
+    setTimeout(() => box.classList.remove('flash'), 300);
+  }
+  new Audio('Songs/Sucesso.mp3').play();
 }
 
 let tapCount = 0;
