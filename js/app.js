@@ -168,7 +168,7 @@ function buildMusicOverlay() {
   });
   overlay.dataset.built = 'true';
   overlay.addEventListener('click', e => {
-    if (e.target.id === 'music-overlay') hideMusicOverlay();
+    if (!currentAudio && e.target.id === 'music-overlay') hideMusicOverlay();
   });
 }
 
@@ -191,26 +191,36 @@ function playMusic(idx) {
   currentAudio = new Audio('Songs/' + encodeURIComponent(music.file));
   const progressBar = document.getElementById(`music-progress-${idx}`);
   document.querySelectorAll('.music-progress-bar').forEach(bar => bar.style.width = '0%');
+  document.querySelectorAll('.boxmusic').forEach(box => box.classList.remove('playing'));
+  const selectedBox = document.querySelectorAll('.boxmusic')[idx];
+  selectedBox.classList.add('playing');
   currentAudio.addEventListener('timeupdate', () => {
     const pct = (currentAudio.currentTime / currentAudio.duration) * 100;
     progressBar.style.width = pct + '%';
   });
   currentAudio.addEventListener('ended', () => {
     disableAllButtons(false);
+    document.querySelectorAll('.boxmusic').forEach(box => box.classList.remove('playing'));
+    currentAudio = null;
   });
   disableAllButtons(true);
   currentAudio.play();
 }
 
 let tapCount = 0;
-let tapTimer = null;
+let tapStartTime = null;
 document.addEventListener('click', () => {
-  tapCount++;
-  if (tapTimer) clearTimeout(tapTimer);
-  tapTimer = setTimeout(() => { tapCount = 0; }, 1000);
-  if (tapCount >= 5 && currentAudio) {
+  const now = Date.now();
+  if (!tapStartTime || now - tapStartTime > 3000) {
+    tapStartTime = now;
+    tapCount = 1;
+  } else {
+    tapCount++;
+  }
+  if (tapCount >= 5 && currentAudio && now - tapStartTime < 3000) {
     fadeOutCurrentAudio();
     tapCount = 0;
+    tapStartTime = null;
   }
 });
 
@@ -230,6 +240,8 @@ function fadeOutCurrentAudio() {
       audio.pause();
       audio.volume = startVolume;
       disableAllButtons(false);
+      document.querySelectorAll('.boxmusic').forEach(box => box.classList.remove('playing'));
+      currentAudio = null;
     }
   }, step);
 }
