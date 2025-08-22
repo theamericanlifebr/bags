@@ -16,18 +16,18 @@ const bagsInfo = [
 ];
 
 const musicList = [
-  { title: 'Mundo colorido', file: 'Mundo colorido.mp3' },
-  { title: 'Casinha do coração', file: 'Casinha do coração.mp3' },
-  { title: 'Você é especial', file: 'Você é especial.mp3' },
-  { title: 'Fábrica de heróis', file: 'Fábrica de Heróis.mp3' },
-  { title: 'Você não é todo mundo', file: 'Você não é todo mundo.mp3' },
-  { title: 'Eu vim aqui para adorar', file: 'Eu vim aqui para adorar.mp3' },
-  { title: 'Louvarei', file: 'Louvarei.mp3' },
-  { title: 'Romanos 8-38', file: 'Romanos 8-38.mp3' },
-  { title: 'Tudo doido', file: 'Tudo Doido por Jesus.mp3' },
-  { title: 'Corta', file: 'Corta.mp3' },
-  { title: 'Vencendo vem Jesus', file: 'Vencendo vem Jesus.mp3' },
-  { title: 'Louvarei', file: 'Louvarei.mp3' }
+  'Mundo colorido',
+  'Casinha do coração',
+  'Você é especial',
+  'Fábrica de Heróis',
+  'Você não é todo mundo',
+  'Eu vim aqui para adorar',
+  'Louvarei',
+  'Romanos 8-38',
+  'Tudo Doido por Jesus',
+  'Corta',
+  'Vencendo vem Jesus',
+  'Louvarei'
 ];
 
 let checkedItemsPerBag = [];
@@ -341,8 +341,8 @@ async function preloadContent() {
       promises.push(new Promise(res => { img.onload = img.onerror = res; }));
     });
   });
-  musicList.forEach(m => {
-    const audio = new Audio('Songs/' + encodeURIComponent(m.file));
+  musicList.forEach(title => {
+    const audio = new Audio('Songs/' + encodeURIComponent(title + '.mp3'));
     promises.push(new Promise(res => {
       audio.addEventListener('canplaythrough', res, { once: true });
       audio.addEventListener('error', res, { once: true });
@@ -359,7 +359,7 @@ async function cacheAssets() {
       assets.push(`Imagens/${folder}/${encodeURIComponent(item)}`);
     });
   });
-  musicList.forEach(m => assets.push('Songs/' + encodeURIComponent(m.file)));
+  musicList.forEach(title => assets.push('Songs/' + encodeURIComponent(title + '.mp3')));
 
   let total = 0;
   for (const url of assets) {
@@ -441,12 +441,12 @@ function renderMusicOverlay() {
   overlay.innerHTML = '';
   const start = currentMusicPage * songsPerPage;
   const end = start + songsPerPage;
-  musicList.slice(start, end).forEach((m, i) => {
+  musicList.slice(start, end).forEach((title, i) => {
     const idx = start + i;
     const box = document.createElement('div');
     box.className = 'boxmusic';
     box.id = `music-box-${idx}`;
-    box.innerText = m.title;
+    box.innerText = title;
 
     let pressTimer;
     let longPress = false;
@@ -517,10 +517,19 @@ function showItemsOverlay() {
   overlay.innerHTML = '';
   Object.keys(itemStatus).forEach(key => {
     const [bagIdx, itemIdx] = key.split('-').map(Number);
-    const div = document.createElement('div');
-    div.className = 'flagged-item';
-    div.textContent = `${bagsInfo[bagIdx].title}: ${bagItems[bagIdx][itemIdx]} - ${itemStatus[key]}`;
-    overlay.appendChild(div);
+    const container = document.createElement('div');
+    container.className = 'flagged-item';
+    const folder = encodeURIComponent(bagsInfo[bagIdx].title);
+    const img = document.createElement('img');
+    img.src = `Imagens/${folder}/${encodeURIComponent(bagItems[bagIdx][itemIdx])}`;
+    img.alt = 'item';
+    container.appendChild(img);
+    const btn = document.createElement('button');
+    const action = itemStatus[key];
+    btn.className = `action-btn ${action}`;
+    btn.textContent = action.charAt(0).toUpperCase() + action.slice(1);
+    container.appendChild(btn);
+    overlay.appendChild(container);
   });
   overlay.style.display = 'flex';
   requestAnimationFrame(() => (overlay.style.opacity = 1));
@@ -550,8 +559,8 @@ function playMusic(idx) {
   if (currentAudio) {
     currentAudio.pause();
   }
-  const music = musicList[idx];
-  currentAudio = new Audio('Songs/' + encodeURIComponent(music.file));
+  const title = musicList[idx];
+  currentAudio = new Audio('Songs/' + encodeURIComponent(title + '.mp3'));
   const progressBar = document.getElementById(`music-progress-${idx}`);
   document.querySelectorAll('.music-progress-bar').forEach(bar => bar.style.width = '0%');
   document.querySelectorAll('.boxmusic').forEach(box => box.classList.remove('playing'));
