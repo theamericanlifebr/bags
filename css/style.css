@@ -122,7 +122,7 @@ h1 {
   max-width: none;
   height: 100%;
   object-fit: contain;
-  opacity: 0.5;
+  opacity: 0.8;
   cursor: pointer;
 }
 
@@ -135,6 +135,8 @@ h1 {
   grid-template-rows: repeat(3, 1fr);
   justify-items: center;
   align-items: center;
+  justify-content: center;
+  align-content: center;
 }
 
 #items-list.grid-2x2 {
@@ -142,12 +144,15 @@ h1 {
   grid-template-rows: repeat(2, 1fr);
   justify-items: center;
   align-items: center;
+  justify-content: center;
+  align-content: center;
 }
 
 #items-list.grid-3x2 .item-img,
 #items-list.grid-2x2 .item-img {
-  width: 140%;
-  height: 140%;
+  width: 119%;
+  height: 119%;
+  margin: auto;
 }
 
 .progress-footer {
