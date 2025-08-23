@@ -73,7 +73,8 @@ function renderPage() {
   bagsInfo.slice(start, end).forEach((bag, idx) => {
     const globalIndex = start + idx;
     const wrapper = document.createElement('div');
-    wrapper.className = 'bag-wrapper';
+    wrapper.className = 'bag-wrapper cascade';
+    wrapper.style.animationDelay = `${idx * 0.1}s`;
 
     const bagDiv = document.createElement('div');
     bagDiv.className = 'bag';
@@ -158,6 +159,13 @@ function renderItems() {
   const folder = encodeURIComponent(bagsInfo[currentBagIndex].title);
   const list = document.getElementById('items-list');
   list.innerHTML = '';
+  list.classList.remove('grid-3x2', 'grid-2x2');
+  const total = currentBagItems.length;
+  if (total === 4) {
+    list.classList.add('grid-2x2');
+  } else if (total === 5 || total === 6) {
+    list.classList.add('grid-3x2');
+  }
   for (let i = start; i < end; i++) {
     const item = currentBagItems[i];
     const checked = checkedItemsPerBag[currentBagIndex].has(i);
@@ -166,7 +174,8 @@ function renderItems() {
     img.id = `item-${i}`;
     img.src = src;
     img.alt = 'item';
-    img.className = `item-img ${checked ? 'checked' : ''}`;
+    img.className = `item-img ${checked ? 'checked' : ''} cascade`;
+    img.style.animationDelay = `${(i - start) * 0.1}s`;
 
     let longPress = false;
     const startPress = () => {
@@ -455,7 +464,8 @@ function renderMusicOverlay() {
   musicList.slice(start, end).forEach((title, i) => {
     const idx = start + i;
     const box = document.createElement('div');
-    box.className = 'boxmusic';
+    box.className = 'boxmusic cascade';
+    box.style.animationDelay = `${i * 0.1}s`;
     box.id = `music-box-${idx}`;
     box.innerText = title;
 
@@ -536,14 +546,17 @@ function hideMusicOverlay() {
 function showItemsOverlay() {
   const overlay = document.getElementById('items-overlay');
   overlay.innerHTML = '';
-  Object.keys(itemStatus).forEach(key => {
+  Object.keys(itemStatus).forEach((key, idx) => {
     const [bagIdx, itemIdx] = key.split('-').map(Number);
     const container = document.createElement('div');
-    container.className = 'flagged-item';
+    container.className = 'flagged-item cascade';
+    container.style.animationDelay = `${idx * 0.1}s`;
     const folder = encodeURIComponent(bagsInfo[bagIdx].title);
     const img = document.createElement('img');
     img.src = `Imagens/${folder}/${encodeURIComponent(bagItems[bagIdx][itemIdx])}`;
     img.alt = 'item';
+    img.classList.add('cascade');
+    img.style.animationDelay = `${idx * 0.1}s`;
     container.appendChild(img);
     const btn = document.createElement('button');
     const action = itemStatus[key];

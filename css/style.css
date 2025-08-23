@@ -130,6 +130,26 @@ h1 {
   opacity: 1;
 }
 
+#items-list.grid-3x2 {
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  justify-items: center;
+  align-items: center;
+}
+
+#items-list.grid-2x2 {
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  justify-items: center;
+  align-items: center;
+}
+
+#items-list.grid-3x2 .item-img,
+#items-list.grid-2x2 .item-img {
+  width: 140%;
+  height: 140%;
+}
+
 .progress-footer {
   position: fixed;
   bottom: 0;
@@ -422,6 +442,16 @@ h1 {
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+
+@keyframes cascade {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.cascade {
+  opacity: 0;
+  animation: cascade 0.5s ease forwards;
 }
 
 
