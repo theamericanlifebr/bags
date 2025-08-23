@@ -176,6 +176,7 @@ function renderItems() {
     img.alt = 'item';
     img.className = `item-img ${checked ? 'checked' : ''} cascade`;
     img.style.animationDelay = `${(i - start) * 0.1}s`;
+    img.style.opacity = checked ? '1' : '0.8';
 
     let longPress = false;
     const startPress = () => {
@@ -239,12 +240,15 @@ function toggleItem(index) {
   }
 
   const itemElement = document.getElementById(`item-${index}`);
-  if (checkedItemsPerBag[currentBagIndex].has(index)) {
-    checkedItemsPerBag[currentBagIndex].delete(index);
+  const set = checkedItemsPerBag[currentBagIndex] || (checkedItemsPerBag[currentBagIndex] = new Set());
+  if (set.has(index)) {
+    set.delete(index);
     itemElement.classList.remove('checked');
+    itemElement.style.opacity = '0.8';
   } else {
-    checkedItemsPerBag[currentBagIndex].add(index);
+    set.add(index);
     itemElement.classList.add('checked');
+    itemElement.style.opacity = '1';
     new Audio('Songs/Sucesso.mp3').play();
   }
   saveProgress();
